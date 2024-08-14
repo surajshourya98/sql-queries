@@ -1,0 +1,95 @@
+USE [GEORTD_ERSO_VTS]
+GO
+/****** Object:  StoredProcedure [dbo].[uspGetvehicleStatusViewData]    Script Date: 01-06-2024 11:28:18 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+ ALTER  PROCEDURE [dbo].[uspGetvehicleStatusViewData]--'ALL',1,123456,'ALL','ALL'
+ (
+  @PlantCode varchar(10) ,
+  @RoleId smallint ,
+  @Emp_Code int ,
+  @Remarks varchar(100),
+  @Status varchar(100)
+ )
+ as
+  begin
+		SELECT DISTINCT Remarks= CASE WHEN Dayssincelastinvoice>100 THEN 'Reimbursement' ELSE remarks end, * FROM (
+         -- select DM.plantCode ,TM.TERMINAL_NAME  , DM.DeviceID,
+		 select DM.plantCode ,TM.TERMINAL_NAME, DeviceID,SIM_NUMBER,DM.IMEINO,DM.PlantCode as InvoiceTerminal,DATEDIFF(DAY,cast(InvoiceTime as date),cast(getdate()as date)) as Dayssincelastinvoice,
+	       ISNULL(TVM.TransportersName,'') as TransportersName  ,
+		    ISNULL(TVM.VendorCode,'') as VendorCode , 
+	        DM.AssignVehNo , CONVERT(VARCHAR(20), DM.AssignVehDate, 103) as AssignVehDate,
+	        T.IMEI,T.PacketStatus,T.TAMPERINGSTATUS
+			-- ,T.UploadedDateTime, 
+			--, (CASE when DM.AssignVehDate > T.UploadedDateTime then DM.AssignVehDate 
+			--    else  T.UploadedDateTime end ) as UploadedDateTime  
+			--, FORMAT((CASE when DM.AssignVehDate > T.UploadedDateTime OR T.UploadedDateTime IS NULL then DM.AssignVehDate 
+			--    else  T.UploadedDateTime end ),'dd/MM/yyyy hh:mm:ss tt') as UploadedDateTime
+				, FORMAT((CASE when --DM.AssignVehDate > T.UploadedDateTime OR 
+			T.UploadedDateTime IS NULL then DM.AssignVehDate 
+			    else  T.UploadedDateTime end ),'dd/MM/yyyy hh:mm:ss tt') as UploadedDateTime,UploadedDateTime As dt
+
+			--,ISNULL( ( Case when DATEDIFF(DAY,UploadedDateTime,GETDATE()) >= 5
+			--	  then 
+			--	   CASE 
+			--		   when TAMPERINGSTATUS = 'NNTN' then 'Device Box Tampered'			
+			--		   when TAMPERINGSTATUS = 'PNNN' then 'Device Power Tampered'
+			--		   when TAMPERINGSTATUS = 'PNTN' then 'Device Power and Box Tampered' 
+			--		   ELSE  DATEDIFF(DAY,UploadedDateTime,GETDATE()) >= 30 then 'Not Working'
+			--		END
+			--		--WHEN  DATEDIFF(DAY,UploadedDateTime,GETDATE()) >= 30 then 'Not Working'
+			--	 else   'Working' end 
+			--	 ),'Working') as Remarks,FORMAT(DVC.InvoiceTime,'dd/MM/yyyy hh:mm:ss tt') as InvoiceTime
+			,ISNULL( ( Case 
+				when DATEDIFF(DAY,UploadedDateTime,GETDATE()) >= 5 AND TAMPERINGSTATUS IN ('NNTN','PNNN','PNTN')
+					then CASE -- when TAMPERINGSTATUS = 'NNNN' then 'Device Box Tampered' --NNNN IS NORMAL STATUS
+						when TAMPERINGSTATUS = 'NNTN' then 'Device Box Tampered'			
+						when TAMPERINGSTATUS = 'PNNN' then 'Device Power Tampered'
+						when TAMPERINGSTATUS = 'PNTN' then 'Device Power and Box Tampered' 
+					END
+				WHEN  DATEDIFF(DAY,UploadedDateTime,GETDATE()) >= 7 then 'Not Working'
+				ELSE 'Working' END
+				),'Working') as Remarks,FORMAT(DVC.InvoiceTime,'dd/MM/yyyy hh:mm:ss tt') as InvoiceTime
+				 --UploadedDateTime as UploadedDateTime1
+
+	  from 
+	 (
+		select  IMEI , PacketStatus , TAMPERINGSTATUS , UploadedDateTime 
+		
+		from VTS_ERSO_LIVE.dbo.PACKET_LIVEMAP with(nolock)
+		 where ID in 
+		 ( 
+		    select Max(ID) as ID from VTS_ERSO_LIVE.dbo.PACKET_LIVEMAP with(nolock) 
+			where    IMEI in (select * from GEORTD_ERSO_VTS.dbo.funcGetIMEIByRole(@RoleId,@Emp_Code) )
+			group by IMEI
+		 ) 
+		) T
+       INNER join GEORTD_ERSO_VTS.dbo.DeviceMaster DM
+	   on DM.IMEINO = T.IMEI
+	   left join GEORTD_ERSO_VTS.dbo.TransporterVehMaster TVM 
+	   on DM.AssignVehNo=TVM.TruckNo	   
+	   left join  GEORTD_ERSO_LPG_WEB.dbo.terminalmaster TM
+	   on DM.plantCode=TM.TERMINAL_CODE
+	   LEFT JOIN
+	   (
+			SELECT IMEI, MAX(DocumentTime) AS InvoiceTime
+			FROM INVOICE_TRIP_MASTER (NOLOCK)
+			GROUP BY IMEI
+	   )DVC ON T.IMEI = DVC.IMEI
+	   where DM.IsActive=1 and DM.IsVehAssign=1 --AND DM.AssignVehNo='NL01L5115'
+	   )MT WHERE
+	    PlantCode= (CASE when @PlantCode ='ALL' then PlantCode else @PlantCode end)
+	   and ( (@Status='Not Working' and @Remarks ='ALL' and (Remarks in ('Device Box Tampered','Device Power Tampered','Device Power and Box Tampered','Not Working') OR Remarks is NULL))
+			  OR( @Status ='Not Working' and @Remarks !='ALL' and Remarks=@Remarks)
+			  OR( @Status='Working' and Remarks in ('Working'))
+			  OR ( @Status='ALL' and (Remarks in ('Working','Not Working','Device Box Tampered','Device Power Tampered','Device Power and Box Tampered')  OR Remarks is NULL) )
+	 )	   
+	    order by dt desc,PlantCode  
+end
+
+
+
+

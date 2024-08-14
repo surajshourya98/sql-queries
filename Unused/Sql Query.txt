@@ -1,0 +1,12 @@
+SELECT 'SIP_TrainingCentre_01062023_FeeBasedScheme' AS TableName, COUNT([Address]) AS RecordCount,
+		SUM(CASE WHEN LatLongCont = 2 THEN 1 ELSE 0 END) AS AddressWithLatLong,
+		SUM(CASE WHEN LatLongCont != 2 THEN 1 ELSE 0 END) AS AddressWithOUTLatLong,
+		SUM(CASE WHEN ISNULL(LEN([Address]),0) <= 15 AND [Address] != 'NULL' AND [Address] IS NOT NULL
+		AND [Address] != '#N/A' THEN 1 ELSE 0 END) AS InCompleteAddress,
+		SUM(CASE WHEN [Address] = 'NULL' OR [Address] IS NULL
+		OR [Address] = '#N/A' THEN 1 ELSE 0 END) AS NullAddress
+		FROM 
+		(
+			SELECT [Address], [dbo].[fn_getLatLongFromString]([Address]) AS LatLongCont
+			FROM SIP_TrainingCentre_01062023_FeeBasedScheme
+		)T

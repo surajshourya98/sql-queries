@@ -1,0 +1,38 @@
+create TRIGGER maintain_persons_history_delete ON persons 
+AFTER delete 
+AS  
+Begin
+SET NOCOUNT ON;
+
+  insert into persons_log
+  (
+	[PersonID]
+      ,[LastName]
+      ,[FirstName]
+      ,[Address]
+      ,[City],
+	  [Action],
+	  [DateTime]
+  )
+	
+	select [PersonID]
+      ,[LastName]
+      ,[FirstName]
+      ,[Address]
+      ,[City]
+	  'delete',
+	  GETDATE()
+	  from deleted
+	    
+end
+
+
+
+
+
+		select * from Persons_log
+		select * from Persons
+
+		insert into persons values('101','kumar','sk','gt','up')
+
+		delete persons where firstName = 'sk'

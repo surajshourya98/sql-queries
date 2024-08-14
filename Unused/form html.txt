@@ -1,0 +1,149 @@
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+
+
+
+
+
+<div class="container">
+    <div class="row"> 
+        <label>Name</label>
+        <input type="text" placeholder="Enter ypur name"><br>
+        <label>Email</label>
+        <input type="text" placeholder="Enter your Email">
+    </div>
+    <div class="row">
+        <h4>Gender</h4><br>
+        <input type="radio" id="male" name="Gender"><label>Male</label>
+        <input type="radio" id="female" name="Gender"><label>Female</label>
+    </div>
+    <div class="row">
+        <h4>Education</h4>
+        <input type="checkbox"><label for="">10th</label><br>
+        <input type="checkbox"><label for="">12th</label><br>
+        <input type="checkbox"><label for="">Graducate</label><br>
+        <input type="checkbox"><label for="">postGraduate</label><br>
+    </div>
+    <div class=" row">
+     <input type="submit">
+    </div>
+</div>
+<div class="row">
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Gender</th>
+            <th>Education</th>
+        </tr>
+        <tr>
+            <td>bvdug</td>
+            <td>bvd@gmail.com</td>
+            <td>male</td>
+            <td>10</td>
+        </tr>
+        
+    </table>
+</div>
+<style>
+table, th, td {
+  border: 1px solid black;
+  border-collapse: collapse;
+}
+th{
+    background-color: darksalmon;
+}
+</style>
+<script>
+
+
+</script>
+
+
+
+
+
+
+
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+	position:relative;
+	right:86%;
+	font-weight: bold;
+  }
+  
+  input::-webkit-datetime-edit {
+	position: relative;
+	left: 18%;
+	font-weight: bold;
+	
+  }
+  
+  input::-webkit-datetime-edit-fields-wrapper {
+	position: relative;
+	
+  }
+
+
+
+
+<div class="col-xxl-6 col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 col-xs-12 mt-t-15 mt-b-15">
+					<div class="mat-elevation-z3 card-stats fillerdiv" style="border-radius: 10px; padding: 10px">
+						<mat-label style="margin: 2px;font-family:var(--figtree-font) ;">From Date</mat-label>
+						<div>
+							<input type="date" [(ngModel)]="minDate" (change)="minDateChange($event)" style="border:none;"/>
+						</div>
+					</div>
+				</div>
+				<div class="col-xxl-6 col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 col-xs-12 mt-t-15 mt-b-15">
+					<div class="mat-elevation-z3 card-stats fillerdiv" style="border-radius: 10px; padding: 10px">
+						<mat-label style="margin: 2px;font-family:var(--figtree-font) ;">To Date</mat-label>
+						<div>
+							<input  type="date" [(ngModel)]="maxDate" (change)="maxDateChange($event)" style="border:none;"/>
+						</div>
+					</div>
+				</div>
+			</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="col-lg-4 col-md-4 col-sm-4 col-12 mt-t-15 mt-b-15">
+        <div class="row mat-elevation-z2 card-stats"
+        style="
+          border-radius: 10px;
+          padding: 18px;
+          background-color: var(--FFFFFF);
+        "> 
+          <div class="col-6">
+            <h3 class="headchard" style="font-weight: 600">
+              {{ this.summarydata?.total_session | number }}
+            </h3>
+            <p class="card-category">
+              {{ "telemetry-dashboard.totalSession" | translate }}
+            </p>
+          
+          </div>
+          <div class="col-4">
+            <label>
+              <i class="fa fa-globe"> </i>
+            </label>
+
+          </div>
+        </div>
+        
+      </div>

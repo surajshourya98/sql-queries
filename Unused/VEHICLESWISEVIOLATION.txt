@@ -1,0 +1,18 @@
+*VEHICLES WISE ALL VIOLATION REPORT QUERIES*
+
+SELECT    a.VehicleNo,t.TransportersName,
+    COUNT(DISTINCT b.IdInvTripMstr) AS SpeedViolationCount,
+    COUNT(DISTINCT c.IdInvTripMstr) AS StoppageViolationCount,
+    COUNT(DISTINCT d.IdInvTripMstr) AS NightDrivingViolationCount,
+COUNT(DISTINCT r.IdInvTripMstr) AS RouteViolationCount,
+COUNT(DISTINCT v.IdInvTripMstr) AS VMUOffCount
+    FROM INVOICE_TRIP_MASTER (nolock) a
+left join SpeedVoilationDetailedReport b on a.IdInvTripMstr=b.IdInvTripMstr
+left join StoppageViolationDetailedReport c on a.IdInvTripMstr=c.IdInvTripMstr
+left join NightDrivingVoilationDetailedReport d on a.IdInvTripMstr=d.IdInvTripMstr
+left join Route_Voilation_Report r on a.IdInvTripMstr=r.IdInvTripMstr
+left join VMUOffReport v on a.IdInvTripMstr=v.IdInvTripMstr
+left join TransporterVehMaster t on a.VehicleNo = t.TruckNo
+    WHERE a.DocumentTime BETWEEN '2024-05-01 00:00:00.000' AND '2024-05-31 23:59:59.000' and IsComplete = 1
+      AND a.plantcode = '2373'
+ group by a.VehicleNo, t.TransportersName

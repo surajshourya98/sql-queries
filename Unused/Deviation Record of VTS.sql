@@ -1,0 +1,11 @@
+  
+  SELECT PLANTCODE, COUNT(*) FROM DeviceMaster WHERE IsVehAssign = 1 GROUP BY PlantCode
+
+
+  SELECT PLANTCODE , COUNT(*) FROM INVOICE_TRIP_MASTER WHERE DocumentTime BETWEEN '2022-01-01 00:00:00.000' AND '2023-01-01 00:00:00.000'
+  AND (IsSpeedVoilation = 1 OR IsRouteVoilation = 1 OR IsStoppageVoilation = 1 OR IsNightDriving  =1 OR IsVMUOff=1)
+  GROUP BY PlantCode
+
+
+
+  SELECT TOP 1 * FROM INVOICE_TRIP_MASTER

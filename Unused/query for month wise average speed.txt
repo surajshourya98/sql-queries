@@ -1,0 +1,23 @@
+
+
+Average Speed per month wise query 
+
+
+
+
+
+
+ SELECT AssignVehNo,PlantCode, PLANT_NAME,   AVG(SPEED) as Avg_Speed FROM PACKET (NOLOCK) A JOIN (
+
+
+SELECT IMEINO,AssignVehNo, PlantCode FROM GEORTD_BSO_VTS.DBO.DeviceMaster WHERE PlantCode='2380' AND IsVehAssign=1
+)B
+ON A.IMEI=B.IMEINO
+JOIN (
+
+
+SELECT truckno, PLANT_NAME FROM GEORTD_BSO_VTS.DBO.TransporterVehMaster 
+)c
+ON B.AssignVehNo=c.TruckNo
+ WHERE SPEED>0
+ GROUP BY AssignVehNo,PlantCode, PLANT_NAME

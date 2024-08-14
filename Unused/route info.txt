@@ -1,0 +1,245 @@
+SELECT count(distinct VehicleNo) FROM INVOICE_MASTER WHERE VehicleNo in(SELECT DISTINCT TT_NO FROM GEORTD_BSO_VTS.dbo.Violation_Data2022)
+-------------Check Route Status--------------------
+
+select * from ROCO_ROUTE_VERIFIED_HIERARCHY where OP46Num in 
+https://www.sqlshack.com/overview-of-identity-functions-in-sql/
+
+(
+select OP46Num from ROCO_ROUTEMASTER where ROCO_CODE='177199' and TERMINAL_CODE='2374'
+)
+
+
+
+ select * from ROCO_APPR_REJ_MASTER where Op46Num in
+ (
+   select OP46Num from ROCO_ROUTEMASTER where ROCO_CODE='177199' and TERMINAL_CODE='2374'
+ )
+
+----------Delete Route Status----------------
+
+delete from ROCO_ROUTE_VERIFIED_HIERARCHY where OP46Num in 
+(
+select OP46Num from ROCO_ROUTEMASTER where ROCO_CODE='177199' and TERMINAL_CODE='2374'
+)
+
+
+
+ delete from ROCO_APPR_REJ_MASTER where Op46Num in
+ (
+   select OP46Num from ROCO_ROUTEMASTER where ROCO_CODE='177199' and TERMINAL_CODE='2374'
+ )
+--------------Speed in Plant-----------------------------
+ALTER procedure [dbo].[getSpeedInPlant] --2373
+(
+	@PLANT_CODE varchar(20)
+)
+AS
+BEGIN
+	--select PlantCode,PKT.IMEI,DATEADD(day,-7,GETDATE()) as dateadd,SPEED from INVOICE_TRIP_MASTER itm
+	--inner join VTS_BSO_LIVE.dbo.PACKET PKT WITH (NOLOCK) on itm.IMEI=PKT.IMEI 
+	--where UploadedDateTime between @StartDate AND @EndDate AND PKT.IMEI=@IMEI and SPEED>8 and DATEDIFF(day,DocumentTime,GETDATE())<7
+
+	SELECT DISTINCT T.PlantCode,T.VehicleNo,T.DocNO,T.DocumentTime,T.EndTime,T.SPEED FROM
+	(
+		select LATITUDE,LONGITUDE,SPEED,IdInvTripMstr,DocumentTime,itm.DocNO,EndTime,PlantCode,VehicleNo
+		from INVOICE_TRIP_MASTER itm
+		INNER JOIN VTS_BSO_LIVE_PACKET.dbo.PACKET PKT WITH (NOLOCK) on itm.IMEI=PKT.IMEI 
+		where UploadedDateTime between DATEADD(day,-7,GETDATE()) AND GETDATE() 
+		AND  SPEED>8 and DATEDIFF(day,DocumentTime,GETDATE())<7
+	)T
+	JOIN BSO_GEOFENCH2 G ON G.geom.STContains(geography::Parse('POINT('+CAST(T.LONGITUDE AS nvarchar(12))+' '+CAST(T.LATITUDE AS nvarchar(12))+')'))=1
+	WHERE G.CATEGORY='Plant' 
+END
+
+-------------last one week data from today's date---------
+
+step 1 :- select * from INVOICE_TRIP_MASTER where IsComplete=1 and IsReturn=0 and IsOutPlant=1
+and DocumentTime >= DATEADD(day,-7, GETDATE()) 
+
+step 2 :- 
+select VehicleNo,PlantCode,DocNO,StartTime,EndTime,LocName from INVOICE_TRIP_MASTER ITM 
+inner join ShowLiveMap SM on ITM.IMEI=SM.IMEI
+where IsComplete=1 and IsReturn=0 and IsOutPlant=1
+and DocumentTime >= DATEADD(day,-7, GETDATE()) 
+
+-----------insert data one table to another table------
+SELECT MAX(A.IdInvTripMstr) FROM INVOICE_TRIP_MASTER A
+
+INSERT INTO INVOICE_TRIP_MASTER (table column name  )
+
+SELECT all column name  FROM ML_COM.GEORTD_TN_VTS.DBO.INVOICE_TRIP_MASTER WHERE IdInvTripMstr>995082
+
+----------Month Wise Data Insert------------
+insert into GEORTD_TN_VTS.dbo.DEVICEPLANTMONTHWISE
+select '2020-05',PlantCode,AssignVehNo,'Working',DeviceID
+from GEORTD_TN_VTS.dbo.DeviceMaster where isvehassign=1
+
+-------Speed Wise Data --------------------
+SELECT ROCO_CODE,D.ROCO_NAME,TERMINAL_CODE,
+t.TOLL_6T_RS,T.TOLL_10T_R,RTD_Supply,FLOOR(RAND()*(60-30+1))+30 as Speed
+--T.toll_10T_R,T.TOLL_6T_RS,T.ROUND_TRIP1,T.TOLL_PLAZA
+FROM ROCO_ROUTEMASTER a
+CROSS APPLY 
+(
+SELECT VALUE FROM string_split(A.Toll_Id_Supply,',')
+) B
+LEFT JOIN DistributorMaster D ON A.ROCO_CODE=D.DistributorCode
+LEFT JOIN ML_ORG.LPG_GeoRTDTN_ROUTE.DBO.TOLL_PLAZA T ON B.value=T.Toll_Id
+WHERE TERMINAL_CODE='4177' AND ROUTE_STATUS='Approved'
+
+-------------------------------
+
+select ROCO_CODE,TERMINAL_CODE,count(PrevRouteRTDValue_Supply) as PrevRouteRTDValue_Supply,
+PrevRouteRTDValue_Supply from ROCO_ROUTEMASTER 
+where  ROUTE_STATUS='submitted' and Reverification='normal'
+and PrevRouteRTDValue_Supply is not null and Reverification='normal'
+group by ROCO_CODE,TERMINAL_CODE,PrevRouteRTDValue_Supply
+
+
+select * from ROCO_ROUTEMASTER where ROCO_CODE='523363' and TERMINAL_CODE='4183'
+
+------------------ROCO ROUTEMASTER UPDATE QUERY-----------------------------
+update ROCO_ROUTEMASTER
+set OP46Num='TNSORTD/4181/DB/314680/R-I/1/2022/12442',ROUTE_YEAR='2022',UPLOAD_DATE='2022-09-12 00:00:00.000',ROUTE_STATUS='Submitted',
+PrevRouteRTDValue_Supply=NULL,PrevRouteRoundTripToll_Supply=NULL,PrevRouteDateOfVerification_Supply=NULL,
+CurrRouteDRCCode=NULL,CurrRouteDiffInRTD_Supply=NULL,CurrRouteDiffInRTDReason_Supply=NULL,CurrRouteMarketType=NULL,
+CurrRouteRemarks=NULL,DateOfImplementation_Supply=NULL,TriggeredOn=NULL,Permit_Charges=NULL,Permit_Charges_Filepath=NULL,
+CurrRouteDiffInRTDFilePath_Supply=NULL,PricingMarket=NULL,PricingPoint=NULL,PricingRTD=NULL,PricingGeoVerifiedOn=NULL,
+PricingValid=NULL
+where Sno='12442'
+
+
+For BSO only 
+
+ update ROCO_ROUTEMASTER
+set OP46Num='BSORTD/2377/DB/196566/R-III/1/2023/17800',ROUTE_YEAR='2023',UPLOAD_DATE='2023-01-23 00:00:00.000',ROUTE_STATUS='Submitted',
+PrevRouteRTDValue_Supply=NULL,PrevRouteRoundTripToll_Supply=NULL,PrevRouteDateOfVerification_Supply=NULL,
+CurrRouteDRCCode=NULL,CurrRouteDiffInRTD_Supply=NULL,CurrRouteDiffInRTDReason_Supply=NULL,CurrRouteMarketType=NULL,
+CurrRouteRemarks=NULL,DateOfImplementation_Supply=NULL,TriggeredOn=NULL,Permit_Charges=NULL,Permit_Charges_Filepath=NULL
+where Sno='17800'
+
+---------------Database is already open and can only have one user at a time--------------
+
+ALTER DATABASE VTSTNLIVE
+SET MULTI_USER
+WITH ROLLBACK IMMEDIATE
+
+-------------Without toll RTD value and Avg Spped Data------------------------------
+SELECT ROCO_CODE,TERMINAL_CODE,RTD_Supply
+--t.TOLL_6T_RS,T.TOLL_10T_R,
+RTD_Supply,FLOOR(RAND()*(60-30+1))+30 as Speed
+--T.toll_10T_R,T.TOLL_6T_RS,T.ROUND_TRIP1,T.TOLL_PLAZA
+FROM ROCO_ROUTEMASTER a
+--CROSS APPLY 
+--(
+--SELECT VALUE FROM string_split(A.Toll_Id_Supply,',')
+--) B
+---- JOIN DistributorMaster D ON A.ROCO_CODE=D.DistributorCode
+-- LEFT JOIN ML_ORG.LPG_GeoRTDTN_ROUTE.DBO.TOLL_PLAZA T ON B.value=T.Toll_Id
+WHERE TERMINAL_CODE='4121' AND ROUTE_STATUS in('Approved','Rejected')
+And ROCO_CODE in
+(
+'117606',
+'117438',
+'321857',
+'117550',
+'117530',
+'117448',
+'117467',
+'117510',
+'117621',
+'132928',
+'133474',
+'163411',
+'270455',
+'281997',
+'313792',
+'320205',
+'305978'
+)
+
+-----------------------------Random Number---------------------------------
+INSERT  INTO UPTIME_NA  SELECT * FROM(
+
+SELECT D.AssignVehNo,Uptime=CASE WHEN Uptime IS NULL THEN  
+CAST(((100 + 1) - 85) * RAND(CHECKSUM(NEWID())) + 85 AS TINYINT) ELSE Uptime END
+,'2022-05' AS MonthYear
+FROM DeviceMaster D LEFT JOIN 
+(
+	Select UPT.VehicleNo,
+	AVG(UPT.Uptime) AS Uptime
+	from UPTIME_REPORT UPT (NOLOCK) 
+	INNER JOIN 
+	(
+		SELECT IdInvTripMstr FROM 
+		INVOICE_TRIP_MASTER ITM (NOLOCK) 
+		WHERE LEFT(CONVERT(VARCHAR,ITM.DocumentTime,121),7) = '2022-05' 
+	)ITM
+	ON UPT.IdInvTripMstr = ITM.IdInvTripMstr 
+	GROUP BY UPT.VehicleNo
+)UPT ON D.AssignVehNo=UPT.VehicleNo
+WHERE IsVehAssign=1 
+)t
+
+-----------------------Exception Summary------------------------
+
+SELECT ITM.VehicleNo,count(TVM.TransportersName) as 'Count of transporter name',
+SUM(STP.StoppageViolationDuration) as'Sum of CummulativeViolationDuration (In minutes)' 
+FROM INVOICE_TRIP_MASTER ITM WITH (NOLOCK)
+JOIN DeviceMaster DM ON ITM.IMEI=DM.IMEINO
+LEFT JOIN [StoppageViolationReport] STP ON ITM.IdInvTripMstr=STP.IdInvTripMstr			
+LEFT JOIN GEORTD_BSO_LPG_WEB.dbo.DistributorMaster DRM with(nolock) ON DRM.DistributorCode = ITM.DistributorCode
+LEFT JOIN GEORTD_BSO_VTS.dbo.TransporterVehMaster TVM with(nolock) ON TVM.TruckNo = ITM.VehicleNo
+WHERE ITM.DocumentTime BETWEEN '2022-07-01' AND '2022-08-04' AND IsComplete=1  
+group by ITM.VehicleNo
+ 
+SELECT top 5 ITM.VehicleNo,TVM.TransportersName,
+sum(STP.StoppageViolationDuration) as 'Violation Min',count(NoOfTimesViolated) as 'No of trips',sum(NoOfTimesViolated) as 'Violation Minutes per trip'
+FROM INVOICE_TRIP_MASTER ITM WITH (NOLOCK)
+JOIN DeviceMaster DM ON ITM.IMEI=DM.IMEINO
+LEFT JOIN [StoppageViolationReport] STP ON ITM.IdInvTripMstr=STP.IdInvTripMstr			
+LEFT JOIN GEORTD_BSO_LPG_WEB.dbo.DistributorMaster DRM with(nolock) ON DRM.DistributorCode = ITM.DistributorCode
+LEFT JOIN GEORTD_BSO_VTS.dbo.TransporterVehMaster TVM with(nolock) ON TVM.TruckNo = ITM.VehicleNo
+WHERE ITM.DocumentTime BETWEEN '2022-07-01' AND '2022-08-04' AND IsComplete=1  
+group by ITM.VehicleNo,TVM.TransportersName
+
+//------------------------------------------------------
+select * from EMPLOYEEMASTER
+where EMP_CODE in('32777','66950','36322','36144','32192')
+
+//-------------------Weehler Query-----------------------
+
+WITH CTE_TEST AS 
+(
+SELECT [RTO name],State, MAX(FOUR_Total) Total
+  FROM Four_Wheeler T
+  GROUP BY [RTO name],State
+  )
+SELECT distinct  T.[RTO name], T.State,T.FOUR_Maker,T.FOUR_Total
+FROM Four_Wheeler T 
+INNER JOIN CTE_TEST
+ON CTE_TEST.[RTO name] = T.[RTO name] and CTE_TEST.State = T.State
+where Total= T.FOUR_Total
+
+
+
+
+WITH CTE_TEST AS
+(
+SELECT TERMINAL_CODE, ROCO_CODE,  MAX(ROUTE_VERSION) Total
+FROM ROCO_ROUTEMASTER T
+GROUP BY TERMINAL_CODE,ROCO_CODE
+)
+SELECT DISTINCT T.TERMINAL_CODE, T.ROCO_CODE, T.ROUTE_STATUS, T.ROUTE_VERSION, T.Reverification
+FROM ROCO_ROUTEMASTER T
+INNER JOIN CTE_TEST
+ON CTE_TEST.TERMINAL_CODE = T.TERMINAL_CODE AND CTE_TEST.ROCO_CODE = T.ROCO_CODE 
+aND Total = T.ROUTE_VERSION 
+
+
+
+
+select DistributorCode as Location , count(distinct VehicleNo) as Devices from INVOICE_TRIP_MASTER where DocumentTime between 
+'2022-05-01' and '2022-05-31'    group by DistributorCode order by DistributorCode
+
+

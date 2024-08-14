@@ -1,0 +1,11 @@
+update devicemaster
+     SET AssignVehNo='',
+		 isActive=1,
+		 IsVehAssign=0,
+	      Remarks= 'Rejected on 05/01/2023 from Veh No TN48AV4104' ,
+	     modifieddate=GETDATE()
+	where assignVehNo in 
+ (
+'TN48AV4104'
+
+ )

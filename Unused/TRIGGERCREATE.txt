@@ -1,0 +1,26 @@
+Create TRIGGER DEVICE_MASTER_ON_UPDATED_TRIGGER ON devicemaster 
+AFTER UPDATE 
+AS  
+Begin
+SET NOCOUNT ON;
+  insert into [DEVICE_MASTER_TRANSACTION]
+ 
+	select
+	a.*
+      ,VendorCode
+      ,TransportersName      
+	  ,'UPDATE'
+	  ,GETDATE()
+	  from deleted A LEFT JOIN TransporterVehMaster t on a.AssignVehNo=t.TransportersName
+	    
+end
+
+update DeviceMaster
+set
+Troubleshooting_Remark='TEST'
+where DeviceID='18080100'
+
+SELECT DEVICE_MASTER_TRANSACTION.PlantCode,DEVICE_MASTER_TRANSACTION.AssignVehNo,TransporterVehMaster.TransportersName
+,TransporterVehMaster.VendorCode FROM DEVICE_MASTER_TRANSACTION 
+full JOIN TransporterVehMaster
+ON DEVICE_MASTER_TRANSACTION.AssignVehNo = TransporterVehMaster.TruckNo;

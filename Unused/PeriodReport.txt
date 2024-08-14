@@ -1,0 +1,48 @@
+WITH TrackRTD AS (
+select VendorCode, TransportersName, sum(TrackedRTD/1000) Tracked_RTD
+from INVOICE_TRIP_MASTER ITM
+join RTDVariationReport R on R.IdInvTripMstr = ITM.IdInvTripMstr
+join TransporterVehMaster T on T.TruckNo = ITM.VehicleNo
+join DeviceMaster D on D.AssignVehNo = ITM.VehicleNo
+where DocumentTime between '2023-04-01 00:00:00.000' and '2024-03-31 23:59:59.999' 
+group by VendorCode, TransportersName),
+
+VehicleCount As(
+select TransportersName,VendorCode, COUNT(AssignVehNo)TotalVehicle from DeviceMaster D
+join TransporterVehMaster T on T.TruckNo = D.AssignVehNo
+where IsVehAssign =1 and isActive =1
+group by VendorCode,TransportersName),
+
+SpeedVioation AS (
+SELECT VendorCode,COUNT(A.IdInvTripMstr)SpeedCount FROM SpeedVoilationDetailedReport A 
+JOIN INVOICE_TRIP_MASTER B ON A.IdInvTripMstr = B.IdInvTripMstr
+join DeviceMaster D on D.AssignVehNo  =A.VehNo
+WHERE HighestSpeed > 60 
+group by VendorCode
+),
+StoppageVioation AS (
+SELECT VendorCode,COUNT(A.IdInvTripMstr)StoppageCount FROM StoppageViolationDetailedReport A 
+JOIN INVOICE_TRIP_MASTER B ON A.IdInvTripMstr = B.IdInvTripMstr
+join DeviceMaster D on D.AssignVehNo  =A.VehicleNo
+group by VendorCode
+),
+NightVioation AS (
+SELECT VendorCode,COUNT(A.IdInvTripMstr)NightCount FROM NightDrivingVoilationDetailedReport A 
+JOIN INVOICE_TRIP_MASTER B ON A.IdInvTripMstr = B.IdInvTripMstr
+join DeviceMaster D on D.AssignVehNo  =A.VehNo
+group by VendorCode
+),
+RouteVioation AS (
+SELECT VendorCode,COUNT(A.IdInvTripMstr)RouteCount FROM Route_Voilation_Report A 
+JOIN INVOICE_TRIP_MASTER B ON A.IdInvTripMstr = B.IdInvTripMstr
+join DeviceMaster D on D.AssignVehNo  =A.VehNo
+join TransporterVehMaster T on T.TruckNo  =A.VehNo
+group by VendorCode
+)
+
+select V.VendorCode, V.TransportersName,TotalVehicle, Tracked_RTD,SpeedCount,StoppageCount,NightCount,RouteCount from TrackRTD T
+join VehicleCount V on V.VendorCode = T.VendorCode
+join SpeedVioation SPD on SPD.VendorCode = T.VendorCode
+join StoppageVioation STP on STP.VendorCode = T.VendorCode
+join NightVioation N on N.VendorCode = T.VendorCode
+join RouteVioation R on R.VendorCode = T.VendorCode

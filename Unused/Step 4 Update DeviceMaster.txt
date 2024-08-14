@@ -1,0 +1,8 @@
+
+
+UPDATE DeviceMaster 
+SET AssignVehNo='NL08D5538',
+IsActive=1,IsVehAssign=1,
+PlantCode=4121,
+ModifiedBy='SURAJ-' 
+WHERE DeviceID=19030341 AND idDeviceMaster=83

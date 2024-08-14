@@ -1,0 +1,24 @@
+SELECT USER_FO_APPROVED_ON,DateOfImplementation_Supply FROM ROCO_ROUTEMASTER  A JOIN ROCO_ROUTE_VERIFIED_HIERARCHY B
+ON A.OP46Num=B.OP46Num AND CAST( A.DateOfImplementation_Supply AS DATE)!= CAST(B.USER_FO_APPROVED_ON AS DATE)
+ORDER BY USER_FO_APPROVED_ON
+
+
+UPDATE A SET DateOfImplementation_Supply=USER_FO_APPROVED_ON
+FROM ROCO_ROUTEMASTER  A JOIN ROCO_ROUTE_VERIFIED_HIERARCHY B
+ON A.OP46Num=B.OP46Num AND CAST( A.DateOfImplementation_Supply AS DATE)!= CAST(B.USER_FO_APPROVED_ON AS DATE)
+
+
+
+
+
+SELECT * FROM ROCO_ROUTEMASTER  A JOIN [Route_Master$] B
+ON A.OP46Num=B.[OP46Num] AND  A.ROCO_CODE= B.[ROCO_CODE] 
+
+
+
+--UPDATE A SET 
+--Total_Toll_Supply=b.[Total_Toll_Supply],
+--CurrRoute_RoundTripToll_Supply=b.[CurrRoute_RoundTripToll_Supply],
+--CurrRoute_RoundTripToll_Supply_MultiAxle=b.[CurrRoute_RoundTripToll_Supply_MultiAxle]
+--FROM ROCO_ROUTEMASTER  A JOIN [Route_Master$] B
+--ON A.OP46Num=B.[OP46Num] AND A.ROCO_CODE= B.[ROCO_CODE] 

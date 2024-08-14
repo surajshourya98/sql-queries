@@ -1,0 +1,26 @@
+Create TRIGGER DEVICE_MASTER_ON_TRIGGER ON devicemaster 
+AFTER INSERT, DELETE 
+AS  
+Begin
+SET NOCOUNT ON;
+  insert into [DEVICE_MASTER_TRANSACTION]
+ 
+	select
+	a.*
+      ,VendorCode
+      ,TransportersName      
+	  ,'DELETE'
+	  ,GETDATE()
+	  from deleted A LEFT JOIN TransporterVehMaster t on a.AssignVehNo=t.TransportersName
+
+	  UNION ALL
+
+	  select
+	a.*
+      ,VendorCode
+      ,TransportersName      
+	  ,'insert'
+	  ,GETDATE()
+	  from inserted A LEFT JOIN TransporterVehMaster t on a.AssignVehNo=t.TransportersName
+	    
+end

@@ -1,0 +1,398 @@
+----------ACTION TAKEN REPORT DATA IMPORT---------------
+//INVOICE TRIP MASTER
+SELECT MAX(A.IdInvTripMstr) FROM INVOICE_TRIP_MASTER A
+
+INSERT INTO INVOICE_TRIP_MASTER ([IMEI]
+      ,[DistributorCode]
+      ,[PlantCode]
+      ,[DocNO]
+      ,[VehicleNo]
+      ,[DocumentTime]
+      ,[Cancellation]
+      ,[StartTime]
+      ,[OutPlantTime]
+      ,[MiddleTime]
+      ,[EndTime]
+      ,[IsOnward]
+      ,[IsOutPlant]
+      ,[IsReturn]
+      ,[IsComplete]
+      ,[IsException]
+      ,[IsSpeedVoilation]
+      ,[IsRouteVoilation]
+      ,[IsStoppageVoilation]
+      ,[IsVMUOff]
+      ,[IsNightDriving]
+      ,[IsDailyDrivingHour]
+      ,[IsRestPeriod]
+      ,[IsHarshBraking]
+      ,[IsSuddenlyAccelaration]
+      ,[IsGeofenceVoilation]
+      ,[IsHarshManeuvering]
+      ,[IsFrequentHalt]
+      ,[IsFrequentRoute]
+      ,[chkReturnMissing]
+      ,[chkEndMissingException]
+      ,[chkNgtSpdVoilation]
+      ,[IsRouteViolation]
+      ,[IsNightDrViolation]
+      ,[IsUptime]
+      ,[VehAtDistributor]
+      ,[rtdvariation]
+      ,[IsStoppageViolation]
+      ,[IsSpeedViolation]
+      ,[DocType]
+      ,[RefDocNo]  )
+
+SELECT [IMEI]
+      ,[DistributorCode]
+      ,[PlantCode]
+      ,[DocNO]
+      ,[VehicleNo]
+      ,[DocumentTime]
+      ,[Cancellation]
+      ,[StartTime]
+      ,[OutPlantTime]
+      ,[MiddleTime]
+      ,[EndTime]
+      ,[IsOnward]
+      ,[IsOutPlant]
+      ,[IsReturn]
+      ,[IsComplete]
+      ,[IsException]
+      ,[IsSpeedVoilation]
+      ,[IsRouteVoilation]
+      ,[IsStoppageVoilation]
+      ,[IsVMUOff]
+      ,[IsNightDriving]
+      ,[IsDailyDrivingHour]
+      ,[IsRestPeriod]
+      ,[IsHarshBraking]
+      ,[IsSuddenlyAccelaration]
+      ,[IsGeofenceVoilation]
+      ,[IsHarshManeuvering]
+      ,[IsFrequentHalt]
+      ,[IsFrequentRoute]
+      ,[chkReturnMissing]
+      ,[chkEndMissingException]
+      ,[chkNgtSpdVoilation]
+      ,[IsRouteViolation]
+      ,[IsNightDrViolation]
+      ,[IsUptime]
+      ,[VehAtDistributor]
+      ,[rtdvariation]
+      ,[IsStoppageViolation]
+      ,[IsSpeedViolation]
+      ,[DocType]
+      ,[RefDocNo]  FROM ML_COM.GEORTD_TN_VTS.DBO.INVOICE_TRIP_MASTER WHERE IdInvTripMstr>1025635
+
+//Speed Violation Report
+SELECT MAX(A.IDSpdVltnDetailRpt) FROM SpeedVoilationDetailedReportData A
+
+INSERT INTO SpeedVoilationDetailedReportData (
+      [IdInvTripMstr]
+      ,[PlantCode]
+      ,[IMEI]
+      ,[VehNo]
+      ,[TransporterName]
+      ,[VendorCode]
+      ,[DocNo]
+      ,[DocumentTime]
+      ,[DistributorCode]
+      ,[ROCO_NAME]
+      ,[TripStatus]
+      ,[Time_STAMP]
+      ,[HighestSpeed]
+      ,[CummulativeViolationDuration]
+      ,[StartDeviationTime]
+      ,[EndDeviationTime]
+      ,[Latitude]
+      ,[Longitude]
+      ,[DeviationLocation] )
+
+SELECT 
+      [IdInvTripMstr]
+      ,[PlantCode]
+      ,[IMEI]
+      ,[VehNo]
+      ,[TransporterName]
+      ,[VendorCode]
+      ,[DocNo]
+      ,[DocumentTime]
+      ,[DistributorCode]
+      ,[ROCO_NAME]
+      ,[TripStatus]
+      ,[Time_STAMP]
+      ,[HighestSpeed]
+      ,[CummulativeViolationDuration]
+      ,[StartDeviationTime]
+      ,[EndDeviationTime]
+      ,[Latitude]
+      ,[Longitude]
+      ,[DeviationLocation]  FROM ML_COM.GEORTD_TN_VTS.DBO.SpeedVoilationDetailedReportData WHERE IDSpdVltnDetailRpt>130851
+
+//---------------------------------------------------------------------------------------
+//Stoppage violation Report
+SELECT MAX(A.IdStoppage) FROM StoppageViolationDetailedReport  A
+
+INSERT INTO StoppageViolationDetailedReport (
+      [IdInvTripMstr]
+      ,[PlantCode]
+      ,[IMEI]
+      ,[VehicleNo]
+      ,[TransportersName]
+      ,[VendorCode]
+      ,[DocNo]
+      ,[DocumentTime]
+      ,[DistributorCode]
+      ,[ROCO_NAME]
+      ,[TripStatus]
+      ,[ViolationDuration]
+      ,[StartDeviationTime]
+      ,[EndDeviationTime]
+      ,[DeviationLocation]
+      ,[StartLatitude]
+      ,[StartLongitude] )
+
+SELECT 
+      [IdInvTripMstr]
+      ,[PlantCode]
+      ,[IMEI]
+      ,[VehicleNo]
+      ,[TransportersName]
+      ,[VendorCode]
+      ,[DocNo]
+      ,[DocumentTime]
+      ,[DistributorCode]
+      ,[ROCO_NAME]
+      ,[TripStatus]
+      ,[ViolationDuration]
+      ,[StartDeviationTime]
+      ,[EndDeviationTime]
+      ,[DeviationLocation]
+      ,[StartLatitude]
+      ,[StartLongitude]  FROM ML_COM.GEORTD_TN_VTS.DBO.StoppageViolationDetailedReport WHERE IdStoppage>185013
+
+------------------------------------------------------------------------------------------------------------
+//Route Violation Report
+SELECT MAX(A.IdRouteViolation) FROM Route_Voilation_Report  A
+
+INSERT INTO Route_Voilation_Report (
+     [IdInvTripMstr]
+      ,[PlantCode]
+      ,[IMEI]
+      ,[VehNo]
+      ,[DistributorCode]
+      ,[DocNo]
+      ,[StartTripTime]
+      ,[EndTripTime]
+      ,[StartLatitude]
+      ,[StartLongitude]
+      ,[StartLocation]
+      ,[EndLatitude]
+      ,[EndLongitude]
+      ,[EndLocation]
+      ,[StartDeviationTime]
+      ,[EndDeviationTime]
+      ,[TotalTimeInMinute]
+      ,[DistByVehicle]
+      ,[ApproxDistanceOfRoute] )
+
+SELECT 
+      [IdInvTripMstr]
+      ,[PlantCode]
+      ,[IMEI]
+      ,[VehNo]
+      ,[DistributorCode]
+      ,[DocNo]
+      ,[StartTripTime]
+      ,[EndTripTime]
+      ,[StartLatitude]
+      ,[StartLongitude]
+      ,[StartLocation]
+      ,[EndLatitude]
+      ,[EndLongitude]
+      ,[EndLocation]
+      ,[StartDeviationTime]
+      ,[EndDeviationTime]
+      ,[TotalTimeInMinute]
+      ,[DistByVehicle]
+      ,[ApproxDistanceOfRoute]  FROM ML_COM.GEORTD_TN_VTS.DBO.Route_Voilation_Report WHERE IdRouteViolation>229769
+
+-------------------------------------------------------------------------------------------------------------
+//Night Driving Vilation Report
+SELECT MAX(A.IdNDVR) FROM NightDrivingVoilationDetailedReportNEW  A
+
+INSERT INTO NightDrivingVoilationDetailedReportNEW (
+     [IdInvTripMstr]
+      ,[PlantCode]
+      ,[IMEI]
+      ,[VehNo]
+      ,[TransporterName]
+      ,[VendorCode]
+      ,[DocNo]
+      ,[DocumentTime]
+      ,[DistributorCode]
+      ,[ROCO_NAME]
+      ,[TripStatus]
+      ,[Time_Stamp]
+      ,[NightDuration]
+      ,[StartDeviationTime]
+      ,[EndDeviationTime]
+      ,[Latitude]
+      ,[Longitude]
+      ,[DeviationLocation] )
+
+SELECT 
+      [IdInvTripMstr]
+      ,[PlantCode]
+      ,[IMEI]
+      ,[VehNo]
+      ,[TransporterName]
+      ,[VendorCode]
+      ,[DocNo]
+      ,[DocumentTime]
+      ,[DistributorCode]
+      ,[ROCO_NAME]
+      ,[TripStatus]
+      ,[Time_Stamp]
+      ,[NightDuration]
+      ,[StartDeviationTime]
+      ,[EndDeviationTime]
+      ,[Latitude]
+      ,[Longitude]
+      ,[DeviationLocation]  FROM ML_COM.GEORTD_TN_VTS.DBO.NightDrivingVoilationDetailedReportNEW WHERE IdNDVR>79535
+
+//-------------------------------------------------------------------------------------------------------------
+//VMU Off Report
+SELECT MAX(A.IdVMUOff) FROM VMUOffReport  A
+
+INSERT INTO VMUOffReport (
+     [IdInvTripMstr]
+      ,[PlantCode]
+      ,[IMEI]
+      ,[VehNo]
+      ,[TransporterName]
+      ,[VendorCode]
+      ,[DocNo]
+      ,[DocumentTime]
+      ,[DistributorCode]
+      ,[ROCO_NAME]
+      ,[OffStartTime]
+      ,[Landmarks] )
+
+SELECT 
+     [IdInvTripMstr]
+      ,[PlantCode]
+      ,[IMEI]
+      ,[VehNo]
+      ,[TransporterName]
+      ,[VendorCode]
+      ,[DocNo]
+      ,[DocumentTime]
+      ,[DistributorCode]
+      ,[ROCO_NAME]
+      ,[OffStartTime]
+      ,[Landmarks]  FROM ML_COM.GEORTD_TN_VTS.DBO.VMUOffReport WHERE IdVMUOff>217299
+
+---------------------------------------------------------------------------------------------------------------
+//DeviceMaster
+
+INSERT INTO DeviceMaster (
+      [DeviceID]
+      ,[IMEINO]
+      ,[SIM_NUMBER]
+      ,[PlantCode]
+      ,[IsActive]
+      ,[IsVehAssign]
+      ,[AssignVehNo]
+      ,[CreatedDate]
+      ,[ModifiedDate]
+      ,[AssignVehDate]
+      ,[NotWorkingReason]
+      ,[Remarks]
+      ,[IsOnTrip]
+      ,[IsRepair]
+      ,[ModifiedBy]
+      ,[Capacity]
+      ,[Action]
+      ,[isAcknowledge]
+      ,[AckowledgeComment]
+      ,[isAckMay]
+      ,[isAckJune]
+      ,[isAckJuly]
+      ,[IsAckApril]
+      ,[RecDate]
+      ,[IsRec]
+      ,[RecStatus]
+      ,[Isoutofcontract]
+      ,[OutofcontractDate]
+      ,[DeviceReturnStatus]
+      ,[contractstatus]
+      ,[Troubleshooting_Remark]
+      ,[IsRegistered]
+      ,[RegistrationMessage] )
+
+SELECT 
+      [DeviceID]
+      ,[IMEINO]
+      ,[SIM_NUMBER]
+      ,[PlantCode]
+      ,[IsActive]
+      ,[IsVehAssign]
+      ,[AssignVehNo]
+      ,[CreatedDate]
+      ,[ModifiedDate]
+      ,[AssignVehDate]
+      ,[NotWorkingReason]
+      ,[Remarks]
+      ,[IsOnTrip]
+      ,[IsRepair]
+      ,[ModifiedBy]
+      ,[Capacity]
+      ,[Action]
+      ,[isAcknowledge]
+      ,[AckowledgeComment]
+      ,[isAckMay]
+      ,[isAckJune]
+      ,[isAckJuly]
+      ,[IsAckApril]
+      ,[RecDate]
+      ,[IsRec]
+      ,[RecStatus]
+      ,[Isoutofcontract]
+      ,[OutofcontractDate]
+      ,[DeviceReturnStatus]
+      ,[contractstatus]
+      ,[Troubleshooting_Remark]
+      ,[IsRegistered]
+      ,[RegistrationMessage]  FROM ML_COM.GEORTD_TN_VTS.DBO.DeviceMaster WHERE idDeviceMaster>1025635
+
+
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//UPTIME REPORT
+
+
+SELECT  MAX(A.TripId) FROM UPTIME_REPORT A
+
+INSERT INTO [UPTIME_REPORT]( 
+      [IdInvTripMstr]
+      ,[PlantCode]
+      ,[VehicleNo]
+      ,[ActualNumOfPrompts]
+      ,[TotalNumOfPrompts]
+      ,[Uptime])
+
+  SELECT  
+      [IdInvTripMstr]
+      ,[PlantCode]
+      ,[VehicleNo]
+      ,[ActualNumOfPrompts]
+      ,[TotalNumOfPrompts]
+      ,[Uptime]
+  --FROM [GEORTD_TN_VTS].[dbo].[UPTIME_REPORT]
+  FROM ML_COM.[GEORTD_TN_VTS].[DBO].[UPTIME_REPORT] WHERE TripId > 352831
+
+

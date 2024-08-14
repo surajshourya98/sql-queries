@@ -1,0 +1,8 @@
+
+SELECT * FROM DeviceMaster WHERE DeviceID = '' 
+
+
+SELECT TOP 1 * FROM DeviceMaster
+
+
+SELECT MAX(idDeviceMaster) FROM DeviceMaster

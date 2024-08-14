@@ -1,0 +1,3 @@
+<connectionStrings>
+		<add name="db_connection_net" connectionString="datasource=mlinfomap.net; initial catalog=Surajdatabase; uid=sa; password=Intel@1968;"/>
+	</connectionStrings>

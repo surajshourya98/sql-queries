@@ -1,0 +1,15 @@
+------Check both Table truck assign------
+select * from TransporterVehMaster where TruckNo='JH10BN7006'
+select * from DeviceMaster where AssignVehNo='JH09AY2771'
+
+Step:- 1
+ update TransporterVehMaster
+ set TruckNo='JH09AY2771'
+ where SNO='330'
+step:-2
+ update DeviceMaster
+ set AssignVehNo='JH09AY2771'
+ where DeviceID='19100339'
+
+
+string connStringCom = @"Data Source=mlsqlcluster1;Initial Catalog=VTSTNLIVE; integrated security=true;TransparentNetworkIPResolution =false;";

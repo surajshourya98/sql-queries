@@ -1,0 +1,8 @@
+select FORMAT(DocumentTime, 'MMM-yy') as Month_Year, PlantCode, TERMINAL_NAME,
+COUNT(distinct IdInvTripMstr) as NoOfViolation
+--count(Distinct IdInvTripMstr) as DistinctTripViolation
+from NightDrivingVoilationDetailedReport (nolock) NG
+LEFT JOIN GEORTD_BSO_LPG_WEB.dbo.TERMINALMASTER TM
+ON NG.PlantCode = TM.TERMINAL_CODE
+where DocumentTime between cast('2023-04-01' as datetime) and GETDATE() and PlantCode='2379' 
+group by FORMAT(DocumentTime, 'MMM-yy'), PlantCode,TERMINAL_NAME

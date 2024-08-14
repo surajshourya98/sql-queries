@@ -1,0 +1,22 @@
+**_____Average speed month wise______***
+
+
+
+SELECT Month_Year,PlantCode,ROUND(AVG(AvgSpeed),0) AS AvgSpeed
+FROM
+(
+SELECT FORMAT(DocumentTime, 'MMM-yy') as Month_Year,
+AV.PlantCode,CR.IMEI,ROUND(AVG(SPEED),2) AS AvgSpeed FROM
+(
+SELECT PlantCode,IMEI,DocumentTime,MiddleTime
+FROM GEORTD_BSO_VTS.DBO.INVOICE_TRIP_MASTER (NOLOCK)
+WHERE PlantCode in ('2372') AND MiddleTime IS NOT NULL
+AND DocumentTime between '2022-09-01' and '2023-08-01'
+)AV CROSS APPLY
+(
+SELECT IMEI, ROUND(AVG(SPEED),2) AS SPEED FROM
+[GEORTD_BSO_VTS].[dbo].[udfGetPKTTrackPoint_MonthWise](AV.IMEI,AV.DocumentTime,AV.MiddleTime)
+WHERE SPEED > 0 GROUP BY IMEI
+)CR GROUP BY FORMAT(DocumentTime, 'MMM-yy'),AV.PlantCode,CR.IMEI
+
+)AVS GROUP BY Month_Year,PlantCode

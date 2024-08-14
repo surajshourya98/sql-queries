@@ -1,0 +1,14 @@
+alter PROCEDURE DeviceDetailsService_CrudNew            -- '132885'
+ @Vendor_Code  nvarchar(20) =null
+ AS
+BEGIN			
+	select TVH.VendorCode,TVH.PlantCode, TVH.TransportersName,
+		    TVH.TruckNo,isnull(ServiceCount,0) as ServiceCount, LastDate
+		    from TransporterVehMaster TVH	
+			left join
+			(
+				select [VEHICLE NO], COUNT(*) as ServiceCount, MAX([DATE]) as LastDate
+				from device_repair group by [VEHICLE NO]	
+			)dr on TVH.TruckNo = dr.[VEHICLE NO]
+			where (TVH.VendorCode = @Vendor_Code or @Vendor_Code is null)
+End

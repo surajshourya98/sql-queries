@@ -1,0 +1,72 @@
+WITH CTEMain AS(
+		SELECT ITM.IdInvTripMstr,ITM.VehicleNo,ITM.DocNO,ITM.DocumentTime,PlantCode		
+		FROM INVOICE_TRIP_MASTER ITM WITH (NOLOCK)
+		WHERE ITM.DocumentTime BETWEEN '2024-01-01' AND '2024-06-30' AND IsComplete=1  and PlantCode='4174' 
+	)
+		--INSERT INTO [dbo].ACTION_TAKEN_REMARKS
+		--(
+		--ViolationType,CountOfViolation,	IdInvTripMstr,RemarksBy,OffenceNo,Action_Taken,	No_Action_Jusify,IsActionRequired,CreatedOn)
+
+	--Must Give empcode of Plant Head
+	SELECT DISTINCT VIOLTYPE,ViolationCount,IdInvTripMstr,'32842' AS EmpCode,
+	(CASE WHEN DB_NAME() = 'GEORTD_erso_VTS' THEN 'B.0.0' ELSE 'P.0.0' END) AS OffenceNo,'NA' as Action_Taken,
+	(CASE WHEN VIOLTYPE = 'Night Driving Voilation' THEN 'TT reached on time' 
+	WHEN VIOLTYPE = 'Speed Voilation' THEN 'Overspeed due to some urgency' 
+	ELSE ' Driver and transporter TT counselled and sensitized' END) AS Remark,
+	1,GETDATE()
+	FROM (
+		SELECT ITM.*,  SPDCount ViolationCount, ActionTaken, VIOLTYPE 
+			FROM CTEMain ITM 
+			  JOIN (
+				SELECT COUNT(*) SPDCount, A.IdInvTripMstr, 'Speed Violation' as VIOLTYPE, 
+				  CASE WHEN B.IdInvTripMstr IS NULL THEN 'Open' ELSE 'Closed' END ActionTaken 
+				FROM SpeedVoilationDetailedReportData A 
+				LEFT JOIN ACTION_TAKEN_REMARKS B ON A.IdInvTripMstr = B.IdInvTripMstr AND B.ViolationType='SPEED Violation' 
+				WHERE HighestSpeed > 60 
+				GROUP BY A.IdInvTripMstr,B.IdInvTripMstr
+			  ) SPD ON ITM.IdInvTripMstr = SPD.IdInvTripMstr
+
+		UNION 
+		SELECT ITM.*,  SPDCount ViolationCount, ActionTaken, VIOLTYPE 
+			FROM CTEMain ITM 
+			  JOIN (
+				SELECT COUNT(*) SPDCount, A.IdInvTripMstr, 'Stoppage Violation' as VIOLTYPE, 
+				  CASE WHEN B.IdInvTripMstr IS NULL THEN 'Open' ELSE 'Closed' END ActionTaken 
+				FROM StoppageViolationDetailedReport A 
+				LEFT JOIN ACTION_TAKEN_REMARKS B ON A.IdInvTripMstr = B.IdInvTripMstr AND B.ViolationType='Stoppage Violation'
+				GROUP BY A.IdInvTripMstr,B.IdInvTripMstr
+			  ) SPD ON ITM.IdInvTripMstr = SPD.IdInvTripMstr
+
+		UNION 
+		SELECT ITM.*,  SPDCount ViolationCount, ActionTaken, VIOLTYPE 
+			FROM CTEMain ITM 
+			  JOIN (
+				SELECT COUNT(*) SPDCount, A.IdInvTripMstr, 'Route Violation' as VIOLTYPE, 
+				  CASE WHEN B.IdInvTripMstr IS NULL THEN 'Open' ELSE 'Closed' END ActionTaken 
+				FROM Route_Voilation_Report A 
+				LEFT JOIN ACTION_TAKEN_REMARKS B ON A.IdInvTripMstr = B.IdInvTripMstr AND B.ViolationType='Route Violation'
+				GROUP BY A.IdInvTripMstr,B.IdInvTripMstr
+			  ) SPD ON ITM.IdInvTripMstr = SPD.IdInvTripMstr
+		UNION 
+		SELECT ITM.*,  SPDCount ViolationCount, ActionTaken, VIOLTYPE 
+			FROM CTEMain ITM 
+			  JOIN (
+				SELECT COUNT(*) SPDCount, A.IdInvTripMstr, 'Night Driving Violation' as VIOLTYPE, 
+				  CASE WHEN B.IdInvTripMstr IS NULL THEN 'Open' ELSE 'Closed' END ActionTaken 
+				FROM NightDrivingVoilationDetailedReportNEW A 
+				LEFT JOIN ACTION_TAKEN_REMARKS B ON A.IdInvTripMstr = B.IdInvTripMstr AND B.ViolationType='Night Driving Violation'
+				GROUP BY A.IdInvTripMstr,B.IdInvTripMstr
+			  ) SPD ON ITM.IdInvTripMstr = SPD.IdInvTripMstr
+		UNION 
+		SELECT ITM.*,  SPDCount ViolationCount, ActionTaken, VIOLTYPE 
+			FROM CTEMain ITM 
+			  JOIN (
+				SELECT COUNT(*) SPDCount, A.IdInvTripMstr, 'Tampering of VMU of VTS' as VIOLTYPE, 
+				  CASE WHEN B.IdInvTripMstr IS NULL THEN 'Open' ELSE 'Closed' END ActionTaken 
+				FROM VMUOffReport A 
+				LEFT JOIN ACTION_TAKEN_REMARKS B ON A.IdInvTripMstr = B.IdInvTripMstr AND B.ViolationType='Tampering of VMU of VTS'
+				GROUP BY A.IdInvTripMstr,B.IdInvTripMstr
+			  ) SPD ON ITM.IdInvTripMstr = SPD.IdInvTripMstr
+		)T 
+	WHERE ViolationCount>0 AND ActionTaken='open'
+	ORDER BY IdInvTripMstr

@@ -1,0 +1,4 @@
+SELECT d.PlantCode,DeviceID,SIM_NUMBER, AssignVehNo,VendorCode, TransportersName
+FROM DeviceMaster D
+FULL JOIN TransporterVehMaster T
+ON D.AssignVehNo = t.TruckNo;

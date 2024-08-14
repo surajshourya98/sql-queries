@@ -1,0 +1,17 @@
+SELECT CASE WHEN  DATEDIFF(DAY,UploadedDateTime,GETDATE())>= 30 then 'Not Working'
+				ELSE 'Working' 
+				END AS REMARKS,
+ITM.PlantCode,DeviceID,SIM_NUMBER,VehicleNo,UploadedDateTime,DocumentTime as 'InvoiceTime',TransportersName,VendorCode  FROM DeviceMaster DM 
+JOIN
+(
+	SELECT I.* FROM INVOICE_TRIP_MASTER I   JOIN 
+	(
+		SELECT VehicleNo, MAX(DocumentTime)MXDocumentTime FROM INVOICE_TRIP_MASTER GROUP BY VehicleNo
+	)MI 
+	ON I.DocumentTime=MI.MXDocumentTime AND I.VehicleNo=MI.VehicleNo
+	WHERE DATEDIFF(DAY, MXDocumentTime,GETDATE())>=30
+)ITM
+ON DM.AssignVehNo=ITM.VehicleNo 
+join ShowLiveMap SLM on ITM.VehicleNo=SLM.Veh_No
+join TransporterVehMaster TVM on ITM.VehicleNo=TVM.TruckNo
+WHERE IsVehAssign=1 

@@ -1,0 +1,15 @@
+WITH MaxDocumentTimeCTE AS (
+    SELECT 
+        vehicleNo, 
+        PlantCode, 
+        StartTime, 
+        DocumentTime,
+		OutPlantTime,
+        ROW_NUMBER() OVER (PARTITION BY vehicleNo ORDER BY DocumentTime DESC) AS rn
+    FROM INVOICE_TRIP_MASTER
+    WHERE DocumentTime BETWEEN '2023-09-01 00:00:00.000' AND '2023-09-30 23:59:59.999'
+    AND PlantCode = '4181' AND StartTime IS NOT NULL AND OutPlantTime is not null
+)
+SELECT VehicleNo, PlantCode,  DocumentTime AS MaxDocumentTime, OutPlantTime as Upload_Time
+FROM MaxDocumentTimeCTE
+WHERE rn = 1;

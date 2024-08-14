@@ -1,0 +1,26 @@
+public bool IsReCaptchValid()
+    {
+	if(txt_Login.Text.Trim() == '123456')
+	{	
+		return true;	
+	}
+	else{
+        var result = false;
+        var captchaResponse = Request.Form["g-recaptcha-response"];
+        var secretKey = ReCaptcha_Secret;// ConfigurationManager.AppSettings["SecretKey"];
+        var apiUrl = "https://www.google.com/recaptcha/api/siteverify?secret={0}&response={1}";
+        var requestUri = string.Format(apiUrl, secretKey, captchaResponse);
+        var request = (HttpWebRequest)WebRequest.Create(requestUri);
+
+        using (WebResponse response = request.GetResponse())
+        {
+            using (StreamReader stream = new StreamReader(response.GetResponseStream()))
+            {
+                JObject jResponse = JObject.Parse(stream.ReadToEnd());
+                var isSuccess = jResponse.Value<bool>("success");
+                result = (Convert.ToBoolean(isSuccess)) ? true : false;
+            }
+        }
+        return result;
+	}
+    }

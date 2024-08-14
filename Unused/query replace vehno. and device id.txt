@@ -1,0 +1,29 @@
+
+
+
+-------------------replace veh no.-----------------------------
+
+    CHECK FIRST by old vehno. and  deviceid
+
+SELECT *  FROM DeviceMaster WHERE AssignVehNo = 'JH05CB2136'
+
+SELECT *  FROM DeviceMaster WHERE DeviceID = '19080330'
+
+UPDATE DeviceMaster
+SET AssignVehNo='JH05CB2136',
+AssignVehDate=GETDATE(),
+Remarks='Replaced from VehNo BR06G2890 on 28/03/2023 by installer name '
+where DeviceID='19080330'
+
+ 
+
+
+
+Then check transportvehmaster and insert here
+
+
+SELECT *  FROM TransporterVehMaster WHERE TruckNo = 'JH05CB2136'
+SELECT *  FROM TransporterVehMaster WHERE TruckNo = 'BR06G2890'
+
+insert into TransporterVehMaster values ('2172','Raninagar TOP','11044190','VINAYAK CARGOMOVERS PVT LTD','WB787326','4A, SYED SALLY STREET, KOLKATA : 700 073')
+
